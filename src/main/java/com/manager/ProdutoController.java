@@ -28,7 +28,7 @@ public class ProdutoController {
 	@GET
 	@Path("produto")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response HelloWord(@QueryParam("listaProdutos") String produtos) {
+	public Response consultarProdutos(@QueryParam("listaProdutos") String produtos) {
 		List<String> nomesProdutos = Arrays.asList(produtos.split(","));
 		return Response.ok(produtoRepository.consultarProdutos(nomesProdutos)).build();
 	}
@@ -37,7 +37,7 @@ public class ProdutoController {
 	@Path("produto")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response Save(Produto produto) {
+	public Response cadastrarProduto(Produto produto) {
 		produtoRepository.cadastrarProduto(produto);
 		return Response.ok(produto).build();
 	}
@@ -46,7 +46,7 @@ public class ProdutoController {
 	@Path("produtos")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response SaveAll(List<Produto> produtos) {
+	public Response cadastrarProdutos(List<Produto> produtos) {
 		produtoRepository.cadastrarProdutos(produtos);
 		return Response.ok(produtos).build();
 	}
@@ -55,7 +55,7 @@ public class ProdutoController {
 	@Path("produto")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response delete(Produto produto) {
+	public Response removerProduto(Produto produto) {
 		produtoRepository.removerProduto(produto);
 		return Response.ok(produto).build();
 	}

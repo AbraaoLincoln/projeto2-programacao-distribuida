@@ -1,6 +1,5 @@
 package com.repositories;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.resources.Produto;
-
 
 
 public class ProdutoRepository {
@@ -65,7 +63,7 @@ public class ProdutoRepository {
     	}
     }
 
-    public Map consultarProdutos(List<String> nomesProdutos) {
+    public Map<String, ArrayList<Produto>>  consultarProdutos(List<String> nomesProdutos) {
         HashMap<String, ArrayList<Produto>> produtosEncontrados = new HashMap<>();
 
         for(String nomeProduto : nomesProdutos) {

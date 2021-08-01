@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 public class ViewController {
 	@GET
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getInteractionsData() {
+    public InputStream getHome() {
 	   return getClass().getResourceAsStream("index.html");
     }
 }
