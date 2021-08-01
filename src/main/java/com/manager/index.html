@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <style>
+        .hide{
+            display: none;
+        }
+
+        a:hover{
+            cursor: grab;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column justify-content-center align-items-center">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light col-11">
+        <div class="container-fluid">
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" onclick="loadCadastro()">Cadastro</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" onclick="loadConsulta()">Consulta</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+    <div class="col-11 customDiv shadow p-3 mb-5 bg-body rounded" id="cadastro">
+        <form class="col-12">
+            <div class="input-group col-6 mb-3">
+                <input type="text" class="form-control" id="supermercado" placeholder="Supermercado">
+                <input type="text" class="form-control" id="nome-produto" placeholder="Nome do produto">
+                <input type="text" class="form-control" id="preco-produto" placeholder="Preco">
+                <button type="button" class="btn btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="alert alert-primary hide" role="alert" id="alert-cadastro-sucesso" onclick="hideAlert()">
+        Produto cadastrado com succeso!
+    </div>
+
+    <div class="alert alert-danger hide" role="alert" id="alert-cadastro-erro" onclick="hideAlert()">
+        Erro ao cadastrar produto!
+      </div>
+
+    <div class="col-11 customDiv shadow p-3 mb-5 bg-body rounded hide" id="consulta">
+        <form class="col-12">
+            <div class="input-group col-6 mb-3">
+                <input type="text" class="form-control" id="produtos" placeholder="Insira aqui o nome dos produtos">
+                <button type="button" class="btn btn-primary" onclick="consultarProduto()">Consultar</button>
+            </div>
+        </form>
+
+        <table class="table col-10">
+            <thead>
+              <tr>
+                <th scope="col">Produto</th>
+                <th scope="col">Melhor Preço</th>
+                <th scope="col">Supermercado</th>
+                <th scope="col">Supermercados Consultados</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const path = "http://localhost:8080/projeto2_programacao_distribuida_rest/api";
+        let activeNavLink = document.getElementsByTagName("ul")[0].children[0].children[0];
+
+        function loadCadastro() {
+            event.preventDefault();
+            let a = event.target;
+            document.getElementById("consulta").classList.add("hide");
+            document.getElementById("cadastro").classList.remove("hide");
+            a.classList.add("active")
+            activeNavLink.classList.remove("active")
+            activeNavLink = a;
+        }
+
+        function loadConsulta() {
+            event.preventDefault();
+            let a = event.target;
+            document.getElementById("cadastro").classList.add("hide");
+            document.getElementById("consulta").classList.remove("hide");
+            a.classList.add("active")
+            activeNavLink.classList.remove("active")
+            activeNavLink = a;
+        }
+
+        async function cadastrarProduto() {
+            try {
+                const endpoint = "/supermercado/produto"
+                let produto = {
+                    supermercado: document.getElementById("supermercado").value,
+                    nome: document.getElementById("nome-produto").value,
+                    preco: document.getElementById("preco-produto").value
+                }
+                
+                let res = await fetch(path + endpoint, {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-type': 'application/json'
+                    }, body: JSON.stringify(produto)
+                })
+
+                console.log(res.status);
+                if(res.status == 200) {
+                    document.getElementById("alert-cadastro-sucesso").classList.remove("hide");
+                }else {
+                    document.getElementById("alert-cadastro-erro").classList.remove("hide");
+                }
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        async function consultarProduto() {
+            try {
+                const endpoint = "/supermercado/produto?listaProdutos=" + document.getElementById("produtos").value;
+                
+                let res = await fetch(path + endpoint);
+
+                //console.log(res.status);
+                // if(res.status == 200) {
+                //     document.getElementById("alert-cadastro-sucesso").classList.remove("hide");
+                // }else {
+                //     document.getElementById("alert-cadastro-erro").classList.remove("hide");
+                // }
+
+                showResultadoConsulta(await res.json());
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        function showResultadoConsulta(resultado) {
+            let produtos = document.getElementById("produtos").value.split(',');
+            let getSupermercadosConsultado = pp => pp.map(p => p.supermercado).join()
+            let tbody =  document.getElementById("table-body")
+            tbody.innerHTML = "";
+
+            for(let p of produtos) {
+                if(Object.keys(resultado).includes(p)) {
+                    let tr = document.createElement('tr');
+                    let produto = document.createElement('td');
+                    let melhorPreco = document.createElement('td');
+                    let supermercadoMelhorPreco = document.createElement('td');
+                    let supermercadoConsultados = document.createElement('td');
+                    
+                    let pp = resultado[p];
+                    produto.innerText = p;
+                    melhorPreco.innerText = pp[0].preco;
+                    supermercadoMelhorPreco.innerText = pp[0].supermercado; 
+                    supermercadoConsultados.innerText = getSupermercadosConsultado(pp)
+
+                    tr.append(produto, melhorPreco, supermercadoMelhorPreco, supermercadoConsultados)
+                    tbody.append(tr);
+                }else {
+                    let tr = document.createElement('tr');
+                    let produtoNaoEncontado = document.createElement('td');
+                    produtoNaoEncontado.innerText = "Nada foi encontado para o produto " + p;
+                    tr.append(produtoNaoEncontado);
+                    tbody.append(tr);
+                }
+            }
+        }
+
+        function hideAlert() {
+            document.getElementById("alert-cadastro-sucesso").classList.add("hide");
+            document.getElementById("alert-cadastro-erro").classList.add("hide");
+        }
+    </script>
+</body>
+</html>
